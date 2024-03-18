@@ -27,8 +27,9 @@ router.post('/insert', async function (req, res) {
 router.post('/update', async function (req, res) {
   try {
     const id = req.body.id;
+    const name = req.body.name;
     const db = await open();
-    const result = await update(db, `INSERT INTO playlists (Name) values ('${id}')`);
+    const result = await update(db, `UPDATE playlists SET Name='${name}' WHERE PlaylistId='${id}'`);
     close(db);
     res.status(200).json(result);
   } catch (err) {

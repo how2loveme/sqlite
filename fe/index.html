@@ -25,91 +25,118 @@
 <div>
     <input type="text" />
     <button onclick="insert()">insert</button>
-    <button>update</button>
+    <button onclick="update()">update</button>
     <button onclick="_delete()">delete</button>
 </div>
 </body>
 <script>
-    const request = async (path, param) => {
-      return new Promise((resolve, reject) => {
-        fetch(path, param)
-          .then((res) => {
-            resolve(res);
-          })
-          .catch((err) => {
-            reject(err);
-          })
-      })
-    }
-    const insert = async () => {
+  const request = async (path, param) => {
+    return new Promise((resolve, reject) => {
+      fetch(path, param)
+        .then((res) => {
+          resolve(res);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+  };
+  const insert = async () => {
+    try {
       await request('http://localhost:3000/api/insert', {
         method: 'POST',
-        body: JSON.stringify({name: document.querySelector('input[type=text]').value || '' }),
+        body: JSON.stringify({ name: document.querySelector('input[type=text]').value }),
         headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      await search();
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (err) {
+      console.log(err);
     }
-    const _delete = async () => {
+    await search();
+  };
+  const update = async () => {
+    try {
+      await request('http://localhost:3000/api/update', {
+        method: 'POST',
+        body: JSON.stringify({
+          id: document.querySelector('input[type=radio]:checked').value,
+          name: document.querySelector('input[type=text]').value,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+
+    await search();
+  };
+  const _delete = async () => {
+    try {
       await request('http://localhost:3000/api/delete', {
         method: 'DELETE',
-        body: JSON.stringify({id: document.querySelector('input[type=radio]:checked').value || ''}),
+        body: JSON.stringify({ id: document.querySelector('input[type=radio]:checked').value }),
         headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      await search();
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (err) {
+      console.log(err);
     }
-    const search = async () => {
-      // const data = await fetch('http://localhost:3000/api/test');
-      // console.log(await data.json());
-      const res = await request('http://localhost:3000/api/test');
-      const data = await res.json();
-      console.log(data);
-      /*
-      // ol > li
-      const ol = document.getElementsByTagName('ol')[0];
-      data.forEach((elem) => {
-        const li = document.createElement('li');
-        li.innerText = `index: '${elem.id}', name: '${elem.name}'`;
-        ol.appendChild(li);
-      })
-      */
 
-      // table > tr > td
-      const table = document.getElementsByTagName('table')[0];
-      while(table.rows.length >= 2) {
-        table.deleteRow(table.rows.length -1);
-      }
-      data.forEach((elem) => {
-        const tr = table.insertRow();
-        const chkTd = document.createElement('td');
-        const idTd = document.createElement('td');
-        const idLabel = document.createElement('label');
-        const nameTd = document.createElement('td');
-        const nameLabel = document.createElement('label');
-        const chk = document.createElement('input');
-        chk.type = 'radio';
-        chk.name = 'chk';
-        chk.value = elem.id;
-        chk.id = `chk${elem.id}`;
-        idLabel.innerText = elem.id;
-        idLabel.htmlFor = chk.id;
-        idTd.appendChild(idLabel);
-        nameLabel.innerText = elem.name;
-        nameLabel.htmlFor = chk.id;
-        nameTd.appendChild(nameLabel);
-        chkTd.appendChild(chk);
-        tr.appendChild(chkTd);
-        tr.appendChild(idTd);
-        tr.appendChild(nameTd);
-        table.appendChild(tr);
-      })
-
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-      search();
+    await search();
+  };
+  const search = async () => {
+    // const data = await fetch('http://localhost:3000/api/test');
+    // console.log(await data.json());
+    const res = await request('http://localhost:3000/api/test');
+    const data = await res.json();
+    console.log(data);
+    /*
+    // ol > li
+    const ol = document.getElementsByTagName('ol')[0];
+    data.forEach((elem) => {
+      const li = document.createElement('li');
+      li.innerText = `index: '${elem.id}', name: '${elem.name}'`;
+      ol.appendChild(li);
     })
+    */
+
+    // table > tr > td
+    const table = document.getElementsByTagName('table')[0];
+    while (table.rows.length >= 2) {
+      table.deleteRow(table.rows.length - 1);
+    }
+    data.forEach((elem) => {
+      const tr = table.insertRow();
+      const chkTd = document.createElement('td');
+      const idTd = document.createElement('td');
+      const idLabel = document.createElement('label');
+      const nameTd = document.createElement('td');
+      const nameLabel = document.createElement('label');
+      const chk = document.createElement('input');
+      chk.type = 'radio';
+      chk.name = 'chk';
+      chk.value = elem.id;
+      chk.id = `chk${elem.id}`;
+      idLabel.innerText = elem.id;
+      idLabel.htmlFor = chk.id;
+      idTd.appendChild(idLabel);
+      nameLabel.innerText = elem.name;
+      nameLabel.htmlFor = chk.id;
+      nameTd.appendChild(nameLabel);
+      chkTd.appendChild(chk);
+      tr.appendChild(chkTd);
+      tr.appendChild(idTd);
+      tr.appendChild(nameTd);
+      table.appendChild(tr);
+    });
+
+  };
+  document.addEventListener('DOMContentLoaded', function () {
+    search();
+  });
 </script>
 </html>
