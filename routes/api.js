@@ -24,7 +24,7 @@ router.post('/insert', async function (req, res) {
     console.log(err.message, err.stack);
   }
 });
-router.post('/update', async function (req, res) {
+router.put('/update', async function (req, res) {
   try {
     const id = req.body.id;
     const name = req.body.name;

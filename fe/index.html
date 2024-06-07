@@ -58,7 +58,7 @@
   const update = async () => {
     try {
       await request('http://localhost:3000/api/update', {
-        method: 'POST',
+        method: 'PUT',
         body: JSON.stringify({
           id: document.querySelector('input[type=radio]:checked').value,
           name: document.querySelector('input[type=text]').value,
@@ -133,7 +133,7 @@
       tr.appendChild(nameTd);
       table.appendChild(tr);
     });
-
+    document.querySelector('input[type=text]').value = '';
   };
   document.addEventListener('DOMContentLoaded', function () {
     search();
