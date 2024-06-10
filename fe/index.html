@@ -27,9 +27,34 @@
     <button onclick="insert()">insert</button>
     <button onclick="update()">update</button>
     <button onclick="_delete()">delete</button>
+    <button onclick="throttle(test2, 3)">Click Me!</button>
 </div>
 </body>
 <script>
+  const throttle = (fn, seconds) => {
+    console.log(`gg: ${window.throttleId}`);
+    if (!window.throttleId) {
+      window.throttleId = 'kungs';
+      fn();
+      setTimeout(() => {
+        window.throttleId = null;
+      }, seconds * 1000);
+    }
+  };
+
+  const test2 = () => {
+    console.log(`clicked! ${window.timerId}`);
+  };
+
+  const debounce = (fn, seconds, e) => {
+    clearTimeout(window.timerId);
+    window.timerId = setTimeout(fn.bind(this, e), seconds * 1000);
+  };
+
+  const test = (e) => {
+    console.log(`window.timerId: ${window.timerId} debounce: ${e.target.value}`);
+  };
+
   const request = async (path, param) => {
     return new Promise((resolve, reject) => {
       fetch(path, param)
@@ -136,7 +161,10 @@
     document.querySelector('input[type=text]').value = '';
   };
   document.addEventListener('DOMContentLoaded', function () {
+    window.timerId = 0;
+    window.throttleId = null;
     search();
+    document.querySelector('input[type=text]').addEventListener('keyup', debounce.bind(this, test, 1));
   });
 </script>
 </html>
