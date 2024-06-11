@@ -36,43 +36,37 @@
 </div>
 </body>
 <script>
-  const getRandom = () => Math.ceil(Math.random() * 1000);
-  const throttle = (fn, seconds, e) => {
-    if (!e.target.hasAttribute('throttleId')) {
-      e.target.setAttribute('throttleId', `throttle${getRandom()}`);
-    }
-    let throttleId = e.target.getAttribute('throttleId');
-    console.log(`gg: ${window[throttleId]}`);
-    if (!window[throttleId]) {
-      window[throttleId] = throttleId;
-      fn(e);
-      setTimeout(() => {
-        window[throttleId] = null;
-      }, seconds * 1000);
+  const throttle = (fn, seconds) => {
+    let timer = null;
+    return (...args) => {
+      // console.log(`throttle timer: ${timer}`)
+      if (!timer) {
+        fn.apply(this, args);
+        // fn.call(this, ...args);
+        timer = setTimeout(() => {
+          timer = null;
+        }, seconds * 1000);
+      }
     }
   };
 
-  const clickEv = (e) => {
-    console.log(`clicked! ${window[e.target.getAttribute('throttleId')]}`);
+  const clickEv = (elemId, e) => {
+    console.log(`clicked! ${elemId} : ${e.target.id}`);
   };
 
-  const debounce = (fn, seconds, e) => {
-    if (!e.target.hasAttribute('debounceId')) {
-      e.target.setAttribute('debounceId', `debounce${getRandom()}`);
+  const debounce = (fn, seconds) => {
+    let timer = null;
+      return (...args) => {
+        // console.log(`debounce timer: ${timer}`)
+        if (timer) {
+          clearTimeout(timer);
+        }
+        timer = setTimeout(fn.bind(this, ...args), seconds * 1000);
     }
-    let debounceId = e.target.getAttribute('debounceId');
-    clearTimeout(window[debounceId]);
-    window[debounceId] = setTimeout(() => {
-      fn(e);
-    }, seconds * 1000);
   };
 
-  const keyupEv = (e) => {
-    console.log(`
-        window.debounceId: ${e.target.getAttribute('debounceId')},
-        timerId:${window[e.target.getAttribute('debounceId')]},
-        debounce ${e.target.id}: ${e.target.value}
-    `);
+  const keyupEv = (elemId, e) => {
+    console.log(`key upped! ${elemId} : ${e.target.value}`);
   };
 
   const request = async (path, param) => {
@@ -185,12 +179,10 @@
     // window.throttleId = null;
     search();
     document.querySelectorAll('input[type=text]').forEach((elem) => {
-      elem.addEventListener('keyup', (e) => {
-        debounce(keyupEv, 1, e);
-      });
+      elem.addEventListener('keyup', debounce(keyupEv, 1).bind(this, elem.getAttribute('id')));
     }, this);
     document.querySelectorAll('button[type=button]').forEach((elem) => {
-      elem.addEventListener('click', throttle.bind(this, clickEv, 3));
+      elem.addEventListener('click', throttle(clickEv, 3).bind(this, elem.getAttribute('id')));
     }, this);
   });
 </script>
