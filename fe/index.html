@@ -23,36 +23,56 @@
     </table>
 </div>
 <div>
-    <input type="text" />
+    <label for="ipt1">ipt1</label><input type="text" id="ipt1"/>
+    <br/>
+    <label for="ipt2">ipt2</label><input type="text" id="ipt2"/>
+    <br/>
     <button onclick="insert()">insert</button>
     <button onclick="update()">update</button>
     <button onclick="_delete()">delete</button>
-    <button onclick="throttle(test2, 3)">Click Me!</button>
+    <br/>
+    <button type="button" id="btn1">Click Me!</button>
+    <button type="button" id="btn2">Click Me2!</button>
 </div>
 </body>
 <script>
-  const throttle = (fn, seconds) => {
-    console.log(`gg: ${window.throttleId}`);
-    if (!window.throttleId) {
-      window.throttleId = 'kungs';
-      fn();
+  const getRandom = () => Math.ceil(Math.random() * 1000);
+  const throttle = (fn, seconds, e) => {
+    if (!e.target.hasAttribute('throttleId')) {
+      e.target.setAttribute('throttleId', `throttle${getRandom()}`);
+    }
+    let throttleId = e.target.getAttribute('throttleId');
+    console.log(`gg: ${window[throttleId]}`);
+    if (!window[throttleId]) {
+      window[throttleId] = throttleId;
+      fn(e);
       setTimeout(() => {
-        window.throttleId = null;
+        window[throttleId] = null;
       }, seconds * 1000);
     }
   };
 
-  const test2 = () => {
-    console.log(`clicked! ${window.timerId}`);
+  const clickEv = (e) => {
+    console.log(`clicked! ${window[e.target.getAttribute('throttleId')]}`);
   };
 
   const debounce = (fn, seconds, e) => {
-    clearTimeout(window.timerId);
-    window.timerId = setTimeout(fn.bind(this, e), seconds * 1000);
+    if (!e.target.hasAttribute('debounceId')) {
+      e.target.setAttribute('debounceId', `debounce${getRandom()}`);
+    }
+    let debounceId = e.target.getAttribute('debounceId');
+    clearTimeout(window[debounceId]);
+    window[debounceId] = setTimeout(() => {
+      fn(e);
+    }, seconds * 1000);
   };
 
-  const test = (e) => {
-    console.log(`window.timerId: ${window.timerId} debounce: ${e.target.value}`);
+  const keyupEv = (e) => {
+    console.log(`
+        window.debounceId: ${e.target.getAttribute('debounceId')},
+        timerId:${window[e.target.getAttribute('debounceId')]},
+        debounce ${e.target.id}: ${e.target.value}
+    `);
   };
 
   const request = async (path, param) => {
@@ -158,13 +178,20 @@
       tr.appendChild(nameTd);
       table.appendChild(tr);
     });
-    document.querySelector('input[type=text]').value = '';
+    document.querySelector('input[type=text][id=ipt1]').value = '';
   };
   document.addEventListener('DOMContentLoaded', function () {
-    window.timerId = 0;
-    window.throttleId = null;
+    // window.timerId = 0;
+    // window.throttleId = null;
     search();
-    document.querySelector('input[type=text]').addEventListener('keyup', debounce.bind(this, test, 1));
+    document.querySelectorAll('input[type=text]').forEach((elem) => {
+      elem.addEventListener('keyup', (e) => {
+        debounce(keyupEv, 1, e);
+      });
+    }, this);
+    document.querySelectorAll('button[type=button]').forEach((elem) => {
+      elem.addEventListener('click', throttle.bind(this, clickEv, 3));
+    }, this);
   });
 </script>
 </html>
