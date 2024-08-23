@@ -9,9 +9,21 @@ router.get('/hello', function (req, res) {
 });
 router.get('/test', async function (req, res) {
   const db = await open();
-  const result = await select(db, `SELECT PlaylistId as id, Name as name FROM playlists`);
+  const query = req.query.query || '';
+  const currentPage = req.query.currentpage || 1;
+  const itemPerPage = req.query.itemPerPage;
+  const pagingOption = itemPerPage ? `LIMIT ${itemPerPage} OFFSET ${(currentPage - 1) * itemPerPage}` : '';
+  const result = await select(db, `SELECT PlaylistId as id, Name as name FROM playlists WHERE name like '%${query}%' ${pagingOption}`);
   close(db);
   res.status(200).json(result);
+});
+router.get('/count', async function (req, res) {
+  const db = await open();
+  const query = req.query.query;
+  const itemPerPage = req.query.itemPerPage || 1;
+  const result = await select(db, `SELECT count(1) as count FROM playlists WHERE name like '%${query.trim()}%'`);
+  close(db);
+  res.status(200).json(Math.ceil(result[0].count / itemPerPage));
 });
 router.post('/insert', async function (req, res) {
   try {
